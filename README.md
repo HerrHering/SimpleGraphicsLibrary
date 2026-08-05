@@ -4,6 +4,44 @@ A lightweight, boilerplate-free C++20 graphics framework built on **OpenGL 4.6 C
 
 ---
 
+# Sales Pitch - 🚀 Forget React. Forget Unreal Engine 5. Meet the Future of Computing.
+
+Are you tired of Unreal Engine taking 45 minutes to compile shaders for a single cube? Tired of WebGL requiring 14 build tools, 800 MB of `node_modules`, and a sacrifice to the GPU gods just to draw a triangle? 
+
+**The era of legacy rendering is over.** 
+
+Introducing the **Next Global Standard in Spatial Manipulation Frameworks™**—a C++20 disruption engine designed to make Unreal Engine 5 look like Microsoft Paint.
+
+---
+
+### 🔥 Why 100% of Developers Will Migrate by Next Week:
+
+* ⚡ **Blazingly Fast™ C++20 Architecture**: Written exclusively in C++20 because C++17 is for boomers and C++23 hasn't earned our respect yet.
+* 🎯 **The Universal Cartesian Protocol**: We fixed geometry. $(0,0)$ is at the bottom-left now. If you’re still using top-left origins, you’re literally living in 1995. 
+* 🧠 **Disruptive `std::cerr` Quantum Hijacking**: We didn't just build a logger—we *hijacked* the C++ standard library. `std::cerr` belongs to us now. It auto-detects your exact source file location and formats errors in glorious, neon ANSI colors before your CPU even realizes you made a syntax mistake.
+* 🛡️ **Segfault-Immune™ Defense Shield**: Our RAII destructors check `glfwGetCurrentContext()` so aggressively that memory leaks physically cannot exist in your timeline. If the window closes early, the framework just laughs and lets the OS handle it. 
+* 🎨 **Raylib-Terminating 2D Engine**: Draw a circle with *one line of code*. Raylib in shambles. Unity developers weeping in the corner.
+* 🔄 **Speed-of-Thought SDF Hot-Swapping**: Recompile raymarched fragment pipelines on the fly by pressing key `1`, `2`, or `3`. While other engines are showing loading screens, our framework has already rendered three procedural toruses in 4K.
+
+---
+
+### 📊 Industry Impact Forecast
+
+| Framework | Lines of Boilerplate | Shader Compile Time | Will it replace C++? |
+| :--- | :--- | :--- | :--- |
+| **Unreal Engine 5** | 10,000,000+ | 45 minutes | No |
+| **React / WebGL** | 800 MB of `node_modules` | Eternity | Already dying |
+| **Our Framework** | **0** | **0.0001s** | **Yes, by Q4 2026.** |
+
+---
+
+> *"I threw my GPU out the window and ran this framework on a toaster. It rendered a raymarched sphere at 240 FPS in bold Cyan text."*  
+> — **Senior Tech Lead at Google (Probably)**
+
+**Download now.** Star the repo. Tell your boss you're rewriting the company stack tonight. 🚀
+
+---
+
 ## 📑 Table of Contents
 
 1. [🛠️ GLAD Configuration & Setup](#️-glad-configuration--setup)
