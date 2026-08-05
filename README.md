@@ -4,7 +4,21 @@ A lightweight, boilerplate-free C++20 graphics framework built on **OpenGL 4.6 C
 
 ---
 
-# Sales Pitch - 🚀 Forget React. Forget Unreal Engine 5. Meet the Future of Computing.
+## 📑 Table of Contents
+
+0. [🚀 Sales Pitch](#sales-pitch----forget-react-forget-unreal-engine-5-meet-the-future-of-computing)
+1. [🛠️ GLAD Configuration & Setup](#️-glad-configuration--setup)
+2. [💻 System Requirements](#-system-requirements)
+3. [🚀 Quick Start (Building)](#-quick-start-building)
+4. [✅ What CAN Be Done](#-what-can-be-done)
+5. [❌ What CANNOT Be Done (Out of Scope)](#-what-cannot-be-done-out-of-scope)
+6. [📁 Source Code Map](#-source-code-map)
+7. [🔍 Main Application Architecture (`main.cpp` Step-by-Step)](#-main-application-architecture-maincpp-step-by-step)
+8. [🎮 Testing & Interactive Controls](#-testing--interactive-controls)
+
+---
+
+## Sales Pitch - 🚀 Forget React. Forget Unreal Engine 5. Meet the Future of Computing.
 
 Are you tired of Unreal Engine taking 45 minutes to compile shaders for a single cube? Tired of WebGL requiring 14 build tools, 800 MB of `node_modules`, and a sacrifice to the GPU gods just to draw a triangle? 
 
@@ -23,8 +37,6 @@ Introducing the **Next Global Standard in Spatial Manipulation Frameworks™**�
 * 🎨 **Raylib-Terminating 2D Engine**: Draw a circle with *one line of code*. Raylib in shambles. Unity developers weeping in the corner.
 * 🔄 **Speed-of-Thought SDF Hot-Swapping**: Recompile raymarched fragment pipelines on the fly by pressing key `1`, `2`, or `3`. While other engines are showing loading screens, our framework has already rendered three procedural toruses in 4K.
 
----
-
 ### 📊 Industry Impact Forecast
 
 | Framework | Lines of Boilerplate | Shader Compile Time | Will it replace C++? |
@@ -39,19 +51,6 @@ Introducing the **Next Global Standard in Spatial Manipulation Frameworks™**�
 > — **Senior Tech Lead at Google (Probably)**
 
 **Download now.** Star the repo. Tell your boss you're rewriting the company stack tonight. 🚀
-
----
-
-## 📑 Table of Contents
-
-1. [🛠️ GLAD Configuration & Setup](#️-glad-configuration--setup)
-2. [💻 System Requirements](#-system-requirements)
-3. [🚀 Quick Start (Building)](#-quick-start-building)
-4. [✅ What CAN Be Done](#-what-can-be-done)
-5. [❌ What CANNOT Be Done (Out of Scope)](#-what-cannot-be-done-out-of-scope)
-6. [📁 Source Code Map](#-source-code-map)
-7. [🔍 Main Application Architecture (`main.cpp` Step-by-Step)](#-main-application-architecture-maincpp-step-by-step)
-8. [🎮 Testing & Interactive Controls](#-testing--interactive-controls)
 
 ---
 
