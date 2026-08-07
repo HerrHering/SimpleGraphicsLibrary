@@ -8,6 +8,9 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
+# Export compile commands for language servers (clangd)
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 # Include FetchContent module for remote dependencies
 include(FetchContent)
 
@@ -47,13 +50,13 @@ find_package(OpenGL REQUIRED)
 # 3. Target Definition & Sources
 # ==============================================================================
 
-add_executable(${PROJECT_NAME} 
-    src/main.cpp
-    src/Shader.cpp
-    src/Primitives2D.cpp
+# Create Static Library target (excludes src/main.cpp)
+add_library(${PROJECT_NAME} STATIC
     src/GraphicsManager.cpp
+    src/Primitives2D.cpp
+    src/Shader.cpp
     
-    # GLAD C source file
+    # GLAD C source
     thirdparty/glad/src/gl.c
 )
 
@@ -61,7 +64,8 @@ add_executable(${PROJECT_NAME}
 # 4. Include Directories
 # ==============================================================================
 
-target_include_directories(${PROJECT_NAME} PRIVATE 
+# PUBLIC: Ensures parent projects linking this library automatically inherit these include paths
+target_include_directories(${PROJECT_NAME} PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/glad/include
 )
@@ -86,20 +90,34 @@ endif()
 # ==============================================================================
 
 # Prevent GLFW from including system OpenGL headers (resolves GLAD conflicts)
-target_compile_definitions(${PROJECT_NAME} PRIVATE GLFW_INCLUDE_NONE)
+target_compile_definitions(${PROJECT_NAME} PUBLIC GLFW_INCLUDE_NONE)
 
-target_link_libraries(${PROJECT_NAME} PRIVATE 
+target_link_libraries(${PROJECT_NAME} PUBLIC 
     glfw        # GLFW target populated by FetchContent
     glm::glm    # GLM target populated by FetchContent
     OpenGL::GL  # System OpenGL target
 )
 
-# Optional: Copy shaders directory into the build directory if present
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/shaders")
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
-endif()
+# ==============================================================================
+# 7. Standalone Demo Executable (Only built when running locally)
+# ==============================================================================
 
-# Output binary location setting
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-)
+if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
+    set(DEMO_TARGET "${PROJECT_NAME}_Demo")
+
+    add_executable(${DEMO_TARGET} 
+        src/main.cpp
+    )
+
+    # Link demo to the library target
+    target_link_libraries(${DEMO_TARGET} PRIVATE ${PROJECT_NAME})
+
+    # Optional: Copy shaders directory into build folder if present
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/shaders")
+        file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    endif()
+
+    set_target_properties(${DEMO_TARGET} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+endif()
