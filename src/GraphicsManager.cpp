@@ -31,6 +31,19 @@ namespace Defaults {
             FragColor = u_Color;
         }
     )";
+
+    constexpr const char* FragTexture2D = R"(
+        #version 460 core
+        out vec4 FragColor;
+        in vec2 v_UV;
+
+        uniform sampler2D u_Texture;
+        uniform vec4 u_Color;
+
+        void main() {
+            FragColor = texture(u_Texture, v_UV) * u_Color;
+        }
+    )";
 }
 
 GraphicsManager::GraphicsManager(int width, int height)
@@ -54,7 +67,8 @@ void GraphicsManager::updateViewport(int newWidth, int newHeight) {
 }
 
 void GraphicsManager::compileDefaultShaders() {
-    createShaderFromSource("Default2D", Defaults::Vert2D, Defaults::Frag2D);
+    createShaderFromSource("Default2D", Defaults::Vert2D, Defaults::Frag2D); // Simple vertex and fragment shaders
+    createShaderFromSource("DefaultTexture2D", Defaults::Vert2D, Defaults::FragTexture2D); // Texture shader
 }
 
 Shader* GraphicsManager::createShaderFromSource(const std::string& name, const std::string& vert, const std::string& frag, const std::string& geom) {
@@ -113,6 +127,32 @@ void GraphicsManager::drawCircle(const glm::vec2& center, float radius, const gl
     Shader* default2D = getShader("Default2D");
     if (default2D) {
         primitives2D->drawCircle(center, radius, color, *default2D, orthoProjection);
+    }
+}
+
+void GraphicsManager::drawTexture(const Texture& texture, const glm::vec2& pos, const glm::vec2& size) {
+    Shader* texShader = getShader("DefaultTexture2D");
+    if (texShader) {
+        texShader->use();
+        texture.bind(0);
+        texShader->setInt("u_Texture", 0);
+
+        primitives2D->drawRectangle(pos, size, glm::vec4(1.0f), *texShader, orthoProjection);
+        texture.unbind();
+    }
+}
+
+void GraphicsManager::drawTextureFullscreen(const Texture& texture) {
+    Shader* texShader = getShader("DefaultTexture2D");
+    if (texShader) {
+        texShader->use();
+        texture.bind(0);
+        texShader->setInt("u_Texture", 0);
+        texShader->setMat4("u_Projection", glm::mat4(1.0f));
+        texShader->setMat4("u_Model", glm::mat4(1.0f));
+
+        fullscreenQuad->draw();
+        texture.unbind();
     }
 }
 

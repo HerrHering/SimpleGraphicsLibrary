@@ -52,6 +52,7 @@
 #include "Shader.hpp"
 #include "QuadRenderer.hpp"
 #include "Primitives2D.hpp"
+#include "Texture.hpp"
 
 /**
  * @class GraphicsManager
@@ -81,6 +82,10 @@ public:
     void drawLine(const glm::vec2& start, const glm::vec2& end, const glm::vec4& color, float thickness = 1.0f);
     void drawRectangle(const glm::vec2& pos, const glm::vec2& size, const glm::vec4& color);
     void drawCircle(const glm::vec2& center, float radius, const glm::vec4& color);
+
+    // Texture Display Utilities
+    void drawTexture(const Texture& texture, const glm::vec2& pos, const glm::vec2& size);
+    void drawTextureFullscreen(const Texture& texture);
 
     // Babying the state engine: enforces state cleanup when required
     void unbindAll();

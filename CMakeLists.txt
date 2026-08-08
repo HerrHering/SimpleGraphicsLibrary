@@ -55,6 +55,8 @@ add_library(${PROJECT_NAME} STATIC
     src/GraphicsManager.cpp
     src/Primitives2D.cpp
     src/Shader.cpp
+    src/Texture.cpp
+    src/PingPongBuffer.cpp
     
     # GLAD C source
     thirdparty/glad/src/gl.c
@@ -103,21 +105,30 @@ target_link_libraries(${PROJECT_NAME} PUBLIC
 # ==============================================================================
 
 if(CMAKE_PROJECT_NAME STREQUAL PROJECT_NAME)
-    set(DEMO_TARGET "${PROJECT_NAME}_Demo")
-
-    add_executable(${DEMO_TARGET} 
-        src/main.cpp
+    # Demo
+    set(DEMO_RAYMARCH "${PROJECT_NAME}_Raymarching_Demo")
+    add_executable(${DEMO_RAYMARCH} 
+    src/RaymarchingDemo.cpp
     )
-
     # Link demo to the library target
-    target_link_libraries(${DEMO_TARGET} PRIVATE ${PROJECT_NAME})
+    target_link_libraries(${DEMO_RAYMARCH} PRIVATE ${PROJECT_NAME})
+    set_target_properties(${DEMO_RAYMARCH} PROPERTIES
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
+    
+    # Demo
+    set(DEMO_TEXTURE "${PROJECT_NAME}_Textures_Demo")
+    add_executable(${DEMO_TEXTURE} 
+        src/TexturesDemo.cpp
+    )
+    # Link demo to the library target
+    target_link_libraries(${DEMO_TEXTURE} PRIVATE ${PROJECT_NAME})
+    set_target_properties(${DEMO_TEXTURE} PROPERTIES
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    )
 
     # Optional: Copy shaders directory into build folder if present
     if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/shaders")
         file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/shaders DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
     endif()
-
-    set_target_properties(${DEMO_TARGET} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
-    )
 endif()
