@@ -34,6 +34,14 @@ FetchContent_Declare(
     GIT_PROGRESS TRUE
 )
 
+# Fetch STB (Image writing library)
+FetchContent_Declare(
+    stb
+    GIT_REPOSITORY https://github.com/nothings/stb.git
+    GIT_TAG master
+    GIT_PROGRESS TRUE
+)
+
 # Disable building GLFW docs, tests, and examples to optimize build speed
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
@@ -41,7 +49,7 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 
 # Download and populate GLM and GLFW
-FetchContent_MakeAvailable(glm glfw)
+FetchContent_MakeAvailable(glm glfw stb)
 
 # Locate System OpenGL
 find_package(OpenGL REQUIRED)
@@ -57,6 +65,7 @@ add_library(${PROJECT_NAME} STATIC
     src/Shader.cpp
     src/Texture.cpp
     src/PingPongBuffer.cpp
+    src/ImageSaver.cpp
     
     # GLAD C source
     thirdparty/glad/src/gl.c
@@ -70,6 +79,7 @@ add_library(${PROJECT_NAME} STATIC
 target_include_directories(${PROJECT_NAME} PUBLIC 
     ${CMAKE_CURRENT_SOURCE_DIR}/include
     ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty/glad/include
+    ${stb_SOURCE_DIR}
 )
 
 # ==============================================================================
