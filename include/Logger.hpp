@@ -97,6 +97,14 @@ public:
         #endif
     }
 
+    ~ColorFilterStreamBuf() override {
+        // Flush any trailing content that never got a terminating '\n', so it
+        // isn't silently dropped on destruction / program exit.
+        if (!lineBuffer.empty()) {
+            flushLine();
+        }
+    }
+
     static void setMinSeverity(LogSeverity severity) {
         minThreshold.store(severity);
     }
@@ -121,9 +129,11 @@ protected:
     }
 
     int sync() override {
-        if (!lineBuffer.empty()) {
-            flushLine();
-        }
+        // Do NOT flush a partial (not yet '\n'-terminated) line here.
+        // std::cerr is unitbuf by default, so sync() fires after every single
+        // `<<` in a chained expression, not just at real line boundaries —
+        // flushing here fragments multi-part chains into separate colorized
+        // "lines". Only overflow('\n') should end a line.
         return originalBuf ? originalBuf->pubsync() : 0;
     }
 

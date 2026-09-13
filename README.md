@@ -6,51 +6,21 @@ A lightweight, boilerplate-free C++20 graphics framework built on **OpenGL 4.6 C
 
 ## 📑 Table of Contents
 
-0. [🚀 Sales Pitch](#sales-pitch----forget-react-forget-unreal-engine-5-meet-the-future-of-computing)
+0. [🚀 Tagline](#-tagline)
 1. [🛠️ GLAD Configuration & Setup](#️-glad-configuration--setup)
 2. [💻 System Requirements](#-system-requirements)
 3. [🚀 Quick Start (Building)](#-quick-start-building)
 4. [✅ What CAN Be Done](#-what-can-be-done)
 5. [❌ What CANNOT Be Done (Out of Scope)](#-what-cannot-be-done-out-of-scope)
 6. [📁 Source Code Map](#-source-code-map)
-7. [🔍 Main Application Architecture (`main.cpp` Step-by-Step)](#-main-application-architecture-maincpp-step-by-step)
+7. [🔍 Demo Application Architecture](#-demo-application-architecture)
 8. [🎮 Testing & Interactive Controls](#-testing--interactive-controls)
 
 ---
 
-## Sales Pitch - 🚀 Forget React. Forget Unreal Engine 5. Meet the Future of Computing.
+## 🚀 Tagline
 
-Are you tired of Unreal Engine taking 45 minutes to compile shaders for a single cube? Tired of WebGL requiring 14 build tools, 800 MB of `node_modules`, and a sacrifice to the GPU gods just to draw a triangle? 
-
-**The era of legacy rendering is over.** 
-
-Introducing the **Next Global Standard in Spatial Manipulation Frameworks™**—a C++20 disruption engine designed to make Unreal Engine 5 look like Microsoft Paint.
-
----
-
-### 🔥 Why 100% of Developers Will Migrate by Next Week:
-
-* ⚡ **Blazingly Fast™ C++20 Architecture**: Written exclusively in C++20 because C++17 is for boomers and C++23 hasn't earned our respect yet.
-* 🎯 **The Universal Cartesian Protocol**: We fixed geometry. $(0,0)$ is at the bottom-left now. If you’re still using top-left origins, you’re literally living in 1995. 
-* 🧠 **Disruptive `std::cerr` Quantum Hijacking**: We didn't just build a logger—we *hijacked* the C++ standard library. `std::cerr` belongs to us now. It auto-detects your exact source file location and formats errors in glorious, neon ANSI colors before your CPU even realizes you made a syntax mistake.
-* 🛡️ **Segfault-Immune™ Defense Shield**: Our RAII destructors check `glfwGetCurrentContext()` so aggressively that memory leaks physically cannot exist in your timeline. If the window closes early, the framework just laughs and lets the OS handle it. 
-* 🎨 **Raylib-Terminating 2D Engine**: Draw a circle with *one line of code*. Raylib in shambles. Unity developers weeping in the corner.
-* 🔄 **Speed-of-Thought SDF Hot-Swapping**: Recompile raymarched fragment pipelines on the fly by pressing key `1`, `2`, or `3`. While other engines are showing loading screens, our framework has already rendered three procedural toruses in 4K.
-
-### 📊 Industry Impact Forecast
-
-| Framework | Lines of Boilerplate | Shader Compile Time | Will it replace C++? |
-| :--- | :--- | :--- | :--- |
-| **Unreal Engine 5** | 10,000,000+ | 45 minutes | No |
-| **React / WebGL** | 800 MB of `node_modules` | Eternity | Already dying |
-| **Our Framework** | **0** | **0.0001s** | **Yes, by Q4 2026.** |
-
----
-
-> *"I threw my GPU out the window and ran this framework on a toaster. It rendered a raymarched sphere at 240 FPS in bold Cyan text."*  
-> — **Senior Tech Lead at Google (Probably)**
-
-**Download now.** Star the repo. Tell your boss you're rewriting the company stack tonight. 🚀
+Forget boilerplate. `#include` a header, call a constructor, and start drawing — no engine, no build pipeline, no ceremony.
 
 ---
 
@@ -99,12 +69,15 @@ cd SimpleGraphicsLibrary
 # 2. Configure project with CMake
 cmake -B build
 
-# 3. Build executable
+# 3. Build the library and demo executables
 cmake --build build
 
-# 4. Run executable
-./build/bin/GraphicsManagerApp
+# 4. Run a demo
+./build/bin/GraphicsManagerApp_Raymarching_Demo   # FPS camera + hot-swappable raymarched SDF primitives
+./build/bin/GraphicsManagerApp_Textures_Demo      # Async PBO texture upload + GPU Game of Life
 ```
+
+> These two demo executables are only built when this repo is configured as the top-level CMake project (i.e. not when consumed as a subproject/dependency).
 
 ---
 
@@ -142,6 +115,16 @@ All elements share the native OpenGL Cartesian coordinate space ($+X$ Right, $+Y
 ### 7. 3D FPS Navigation
 - [`Camera`](include/Camera.hpp) provides an Euler-angle 3D camera with view-matrix calculation.
 
+### 8. Texture Upload (Sync & Async)
+- [`Texture`](include/Texture.hpp) ([`src/Texture.cpp`](src/Texture.cpp)) is an RAII 2D texture wrapper supporting both blocking (`updatePixels`, `glTexSubImage2D`) and non-blocking DMA uploads (`updatePixelsAsync`, via a `GL_PIXEL_UNPACK_BUFFER` PBO) so CPU-generated pixel data can be streamed to the GPU without stalling the render thread.
+- [`GraphicsManager::drawTexture`](include/GraphicsManager.hpp) / `drawTextureFullscreen` render a `Texture` in 2D screen space.
+
+### 9. GPU Iterative Compute (Ping-Pong Buffers)
+- [`PingPongBuffer`](include/PingPongBuffer.hpp) ([`src/PingPongBuffer.cpp`](src/PingPongBuffer.cpp)) owns 2 FBOs + 2 textures and alternates read/write between them each `step()`, enabling multi-pass GPU simulations (e.g. cellular automata, blur chains) driven entirely by a fragment shader.
+
+### 10. Image Export
+- [`ImageSaver`](include/ImageSaver.hpp) ([`src/ImageSaver.cpp`](src/ImageSaver.cpp)) writes CPU pixel buffers or GPU `Texture` contents to timestamped PNG files (via `stb_image_write`), handling channel counts and the bottom-left → top-left vertical flip automatically.
+
 ---
 
 ## ❌ What CANNOT Be Done (Out of Scope)
@@ -149,10 +132,10 @@ All elements share the native OpenGL Cartesian coordinate space ($+X$ Right, $+Y
 To maintain a minimal footprint, the following features are **not supported** out of the box:
 
 - **No 3D Model Loading**: Cannot load mesh files (`.obj`, `.fbx`, `.gltf`). Geometry is limited to 2D primitives and procedural screen-quad fragment shaders.
-- **No Built-in Texture / Sprite Loader**: Texture loading libraries (e.g. `stb_image`) are not bundled. 2D rendering is currently limited to solid RGBA colors.
+- **No Image-File Texture Loading**: `Texture` uploads are fed from CPU-generated/computed pixel buffers, not decoded image files — there's no `stb_image`-based loader for `.png`/`.jpg` into a `Texture` (stb is only used by [`ImageSaver`](include/ImageSaver.hpp) for *writing* PNGs out, not reading them in).
 - **No Automatic 2D Batching**: Each 2D primitive shape issues an individual draw call (`glDrawArrays`). Large-scale 2D particle/sprite batching is not implemented.
 - **No Text / Font Rasterization**: No TTF/Bitmap font rendering engine.
-- **No Framebuffer Object (FBO) Chain**: Rendering is directed straight to the default window swapchain buffer (no built-in multi-pass framebuffer manager).
+- **No General-Purpose Multi-Pass FBO Manager**: [`PingPongBuffer`](include/PingPongBuffer.hpp) provides a fixed 2-FBO ping-pong pair for iterative GPU compute, but there's no arbitrary N-pass framebuffer chain/graph — most rendering still targets the default window swapchain buffer directly.
 - **No Physics or Audio**: Focuses exclusively on graphics rendering.
 
 ---
@@ -161,7 +144,8 @@ To maintain a minimal footprint, the following features are **not supported** ou
 
 | Feature / Responsibility | Core Files |
 | :--- | :--- |
-| **Main Application Loop** | [`src/main.cpp`](src/main.cpp) |
+| **Raymarching Demo App** | [`src/RaymarchingDemo.cpp`](src/RaymarchingDemo.cpp) |
+| **Textures Demo App** | [`src/TexturesDemo.cpp`](src/TexturesDemo.cpp) |
 | **Central Manager** | [`include/GraphicsManager.hpp`](include/GraphicsManager.hpp) / [`src/GraphicsManager.cpp`](src/GraphicsManager.cpp) |
 | **Shader Compilation & Uniform Caching** | [`include/Shader.hpp`](include/Shader.hpp) / [`src/Shader.cpp`](src/Shader.cpp) |
 | **Source File Reading & Macro Swapping** | [`include/ShaderLoader.hpp`](include/ShaderLoader.hpp) |
@@ -171,76 +155,55 @@ To maintain a minimal footprint, the following features are **not supported** ou
 | **C++20 Logging & `std::cerr` Hijack** | [`include/Logger.hpp`](include/Logger.hpp) |
 | **OpenGL Driver Debug Context** | [`include/OpenGLDebug.hpp`](include/OpenGLDebug.hpp) |
 | **3D Camera System** | [`include/Camera.hpp`](include/Camera.hpp) |
+| **2D Texture (Sync & Async PBO Upload)** | [`include/Texture.hpp`](include/Texture.hpp) / [`src/Texture.cpp`](src/Texture.cpp) |
+| **Ping-Pong GPU Compute Buffer** | [`include/PingPongBuffer.hpp`](include/PingPongBuffer.hpp) / [`src/PingPongBuffer.cpp`](src/PingPongBuffer.cpp) |
+| **PNG Image Export** | [`include/ImageSaver.hpp`](include/ImageSaver.hpp) / [`src/ImageSaver.cpp`](src/ImageSaver.cpp) |
 
 ---
 
-## 🔍 Main Application Architecture (`main.cpp` Step-by-Step)
+## 🔍 Demo Application Architecture
 
-The sample application in [`src/main.cpp`](src/main.cpp) ties all sub-systems together into a multi-pass pipeline:
+The two demo executables both do their own GLFW/GLAD/`Logger`/`OpenGLDebug` setup and construct their own `GraphicsManager` — there is no shared `main.cpp`.
 
-### Step 1: Logging & Window Context Initialization
-```cpp
-Logger logger(LogSeverity::Info);
-```
-- Instantiates [`Logger`](include/Logger.hpp) to hijack `std::cerr`, set up ANSI terminal colors, and capture source location metadata (`[main.cpp:56 (main)] [Info]`).
-- Configures GLFW hints for an OpenGL 4.6 Core Profile with a Debug Context enabled.
+### `RaymarchingDemo.cpp` — FPS camera + raymarched SDF primitives
 
-### Step 2: Driver Function Loading & Debug Registration
-```cpp
-gladLoadGL(glfwGetProcAddress);
-setupOpenGLDebugging();
-```
-- Loads function pointers via GLAD.
-- Calls `setupOpenGLDebugging()` from [`OpenGLDebug.hpp`](include/OpenGLDebug.hpp) to register driver callback warnings and errors.
+1. **Init**: `Logger logger(LogSeverity::Info)` hijacks `std::cerr`; GLFW window created with an OpenGL 4.6 Core + Debug Context; `gladLoadGL` loads driver function pointers; `setupOpenGLDebugging()` registers the GL debug callback; `GraphicsManager gfx(ctx->width, ctx->height)` pre-compiles internal default 2D shaders and sets up the bottom-left pixel orthographic projection.
+2. **Render loop** (`while (!glfwWindowShouldClose(window))`):
+   - **Camera update**: `processInput()` + the mouse callback drive an FPS-style [`Camera`](include/Camera.hpp) using frame `deltaTime`.
+   - **Hot-reloadable shader compile**: if `ctx->pendingRecompile` is set (on startup, or when key `1`/`2`/`3` swaps `ctx->scene.currentPrimitive`), recompiles the raymarching pipeline via `gfx.createShaderFromSource("Raymarch", SDFScene::getDefaultVertexShaderSource(), ctx->scene.getFragmentShaderSource())`, using [`SDFScene`](include/SDFScene.hpp)/[`ShaderLoader`](include/ShaderLoader.hpp) macro swapping.
+   - **Pass 1 — raymarching**: sends `u_Resolution`, `u_InvView` (inverse of `camera.getViewMatrix()`), `u_Time` uniforms, then `gfx.drawFullscreenQuad("Raymarch")` via [`QuadRenderer`](include/QuadRenderer.hpp).
+   - **Pass 2 — 2D HUD overlay**: `gfx.drawRectangle()` / `drawCircle()` / `drawLine()` from [`Primitives2D`](include/Primitives2D.hpp) draw a status box, LED indicator, and center crosshair over the 3D scene.
+   - **State reset**: `gfx.unbindAll()` clears VAO/VBO/Shader bindings for the next frame.
+3. **Cleanup**: `glfwDestroyWindow` + `glfwTerminate`; all wrappers safely no-op via `glfwGetCurrentContext()` guards in their destructors.
 
-### Step 3: Graphics Manager Setup
-```cpp
-GraphicsManager gfx(ctx->width, ctx->height);
-```
-- Instantiates [`GraphicsManager`](include/GraphicsManager.hpp), which pre-compiles internal default 2D shaders, sets up the bottom-left pixel orthographic projection matrix, and allocates geometry renderers.
+### `TexturesDemo.cpp` — async texture upload + GPU Game of Life
 
-### Step 4: Render Loop & Dynamic Pipeline Recompilation
-Inside the main `while (!glfwWindowShouldClose(window))` loop:
-
-1. **Camera & Movement Update**: Calls `processInput()` and `mouseCallback()` to update the [`Camera`](include/Camera.hpp) view parameters using frame `deltaTime`.
-2. **Hot-Reloadable Shader Compile**: Checks `ctx->pendingRecompile`. If `true` (on startup or when key `1`, `2`, or `3` is pressed):
-   ```cpp
-   gfx.createShaderFromSource("Raymarch", SDFScene::getDefaultVertexShaderSource(), ctx->scene.getFragmentShaderSource());
-   ```
-   Uses [`SDFScene`](include/SDFScene.hpp) and [`ShaderLoader`](include/ShaderLoader.hpp) to dynamically swap GLSL macro definitions and recompile the raymarching pipeline via [`Shader`](include/Shader.hpp).
-3. **Pass 1 — 3D Raymarching Pass**:
-   - Computes the `invView` matrix from `ctx->camera.getViewMatrix()`.
-   - Sends uniforms (`u_Resolution`, `u_InvView`, `u_Time`) to the active raymarching shader.
-   - Calls `gfx.drawFullscreenQuad("Raymarch")` to execute a full-screen fragment raymarching pass via [`QuadRenderer`](include/QuadRenderer.hpp).
-4. **Pass 2 — 2D HUD Overlay Pass**:
-   - Calls `gfx.drawRectangle()`, `gfx.drawCircle()`, and `gfx.drawLine()` from [`Primitives2D`](include/Primitives2D.hpp) to render screen-space UI elements (a status bar, LED indicator, and center crosshair) over the 3D raymarched scene.
-5. **State Reset**:
-   - Calls `gfx.unbindAll()` to reset active VAO, VBO, and Shader bindings, keeping state clean for the next frame.
-
-### Step 5: Graceful Cleanup
-```cpp
-glfwDestroyWindow(window);
-glfwTerminate();
-```
-- Destroys the window and window context cleanly. All OpenGL wrappers safely handle this termination due to `glfwGetCurrentContext()` safety guards inside their destructors.
+1. **Init**: same Logger/GLFW/GLAD/`setupOpenGLDebugging()`/`GraphicsManager` setup as above (no camera, no key callbacks).
+2. **Workflow 1 — CPU-generated texture, async PBO upload**: each frame, a `Texture` is filled with an animated plasma pattern in a CPU pixel buffer, then pushed to the GPU non-blockingly via `Texture::updatePixelsAsync` (PBO DMA transfer).
+3. **Workflow 2 — GPU Game of Life via ping-pong compute**: a `PingPongBuffer` is seeded with `std::mt19937`-randomized noise, then stepped twice per frame (`pingPong.step(*simShader, dummyQuad)`) running a Game-of-Life fragment shader (`Shaders::GameOfLifeFrag`) that reads neighbor cells from the input texture and writes the next generation to the output texture.
+4. **Render**: both results are drawn side by side on screen via `gfx.drawTexture(...)`, then `gfx.unbindAll()`.
 
 ---
 
 ## 🎮 Testing & Interactive Controls
 
-Launch the compiled executable (`./build/bin/GraphicsManagerApp`) to test the framework in real-time:
+### Raymarching Demo (`./build/bin/GraphicsManagerApp_Raymarching_Demo`)
 
-### 3D FPS Camera Controls
+**3D FPS Camera Controls**
 - **`W` / `A` / `S` / `D`**: Move Camera Forward / Left / Backward / Right
 - **`Space`**: Fly Camera Upward (+Y)
 - **`Left Ctrl`**: Fly Camera Downward (-Y)
 - **`Mouse Movement`**: Look / Rotate Camera View in 3D Space
 
-### Real-Time Shader Pipeline Hot-Swapping
+**Real-Time Shader Pipeline Hot-Swapping**
 Press numeric keys to dynamically replace the SDF macro call in the active fragment shader and trigger on-the-fly GLSL recompilation:
 - **`1`**: Switch 3D Raymarched Primitive to **Sphere** (`sdSphere`)
 - **`2`**: Switch 3D Raymarched Primitive to **Box** (`sdBox`)
 - **`3`**: Switch 3D Raymarched Primitive to **Torus** (`sdTorus`)
 
-### Application Controls
+**Application Controls**
 - **`Escape`**: Close application and trigger clean destruction
+
+### Textures Demo (`./build/bin/GraphicsManagerApp_Textures_Demo`)
+
+This demo is non-interactive — it registers no key callback, so `Escape` does nothing here. Close the window (OS close button) to exit and trigger clean destruction.
