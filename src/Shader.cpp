@@ -145,6 +145,20 @@ void Shader::setVec3(const std::string& name, const glm::vec3& value) const { gl
 void Shader::setVec4(const std::string& name, const glm::vec4& value) const { glUniform4fv(getUniformLocation(name), 1, glm::value_ptr(value)); }
 void Shader::setMat4(const std::string& name, const glm::mat4& value) const { glUniformMatrix4fv(getUniformLocation(name), 1, GL_FALSE, glm::value_ptr(value)); }
 
+void Shader::setMat4Array(const std::string& name, const std::vector<glm::mat4>& values) const {
+    if (values.empty()) {
+        std::cerr << "[Shader Warning] setMat4Array called with an empty 'values' vector for uniform '"
+                   << name << "' — nothing uploaded.\n";
+        return;
+    }
+    // GLSL array-addressing convention: element 0 of `uniform mat4 name[N]` is located via "name[0]";
+    // element locations are contiguous from there, so one glUniformMatrix4fv call with count=values.size()
+    // uploads the whole array.
+    GLint location = getUniformLocation(name + "[0]");
+    if (location == -1) return;
+    glUniformMatrix4fv(location, static_cast<GLsizei>(values.size()), GL_FALSE, glm::value_ptr(values[0]));
+}
+
 void Shader::printSourceWithLineNumbers(const std::string& source) {
     std::stringstream ss(source);
     std::string line;

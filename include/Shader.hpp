@@ -30,6 +30,7 @@
 #include <string>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 #include <glm/glm.hpp>
 #include <filesystem>
 
@@ -79,6 +80,11 @@ public:
     void setVec3(const std::string& name, const glm::vec3& value) const;
     void setVec4(const std::string& name, const glm::vec4& value) const;
     void setMat4(const std::string& name, const glm::mat4& value) const;
+
+    /**
+     * @brief Uploads an entire GLSL array uniform (`uniform mat4 name[N];`) in one call.
+     */
+    void setMat4Array(const std::string& name, const std::vector<glm::mat4>& values) const;
 
 private:
     // The "mutable" fields are modifiable within const functions, as this is not a logical detail of the class
